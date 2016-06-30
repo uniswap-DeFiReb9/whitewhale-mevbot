@@ -174,7 +174,7 @@ static void handler_Front(s32 data);
 static void handler_ClockNormal(s32 data);
 static void handler_ClockExt(s32 data);
 
-static void ww_process_ii(uint8_t i, int d);
+static void ww_process_ii(uint8_t *data, uint8_t l);
 
 u8 flash_is_fresh(void);
 void flash_unfresh(void);
@@ -1759,7 +1759,13 @@ static void refresh_preset() {
 	{"WW.MUTEA",WW_MUTEA},
 	{"WW.MUTEB",WW_MUTEB},
 	*/
-static void ww_process_ii(uint8_t i, int d) {
+static void ww_process_ii(uint8_t *data, uint8_t l) {
+	uint8_t i;
+	int d;
+
+	i = data[0];
+	d = (data[1] << 8) + data[2];
+
 	switch(i) {
 		case WW_PRESET:
 			if(d<0 || d>7)
