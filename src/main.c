@@ -320,58 +320,6 @@ void clock(u8 phase) {
 			series_step++;
 
 
-		// TRIGGER
-		triggered = 0;
-		if((rnd() % 255) < w.wp[pattern].step_probs[pos]) {
-			
-			if(w.wp[pattern].step_choice & 1<<pos) {
-				count = 0;
-				for(i1=0;i1<4;i1++)
-					if(w.wp[pattern].steps[pos] >> i1 & 1) {
-						found[count] = i1;
-						count++;
-					}
-
-				if(count == 0)
-					triggered = 0;
-				else if(count == 1)
-					triggered = 1<<found[0];
-				else
-					triggered = 1<<found[rnd()%count];
-			}	
-			else {
-				triggered = w.wp[pattern].steps[pos];
-			}
-			
-			if(w.wp[pattern].tr_mode == 0) {
-				if(triggered & 0x1 && w.tr_mute[0]) gpio_set_gpio_pin(B00);
-				if(triggered & 0x2 && w.tr_mute[1]) gpio_set_gpio_pin(B01);
-				if(triggered & 0x4 && w.tr_mute[2]) gpio_set_gpio_pin(B02);
-				if(triggered & 0x8 && w.tr_mute[3]) gpio_set_gpio_pin(B03);
-			} else {
-				if(w.tr_mute[0]) {
-					if(triggered & 0x1) gpio_set_gpio_pin(B00);
-					else gpio_clr_gpio_pin(B00);
-				}
-				if(w.tr_mute[1]) {
-					if(triggered & 0x2) gpio_set_gpio_pin(B01);
-					else gpio_clr_gpio_pin(B01);
-				}
-				if(w.tr_mute[2]) {
-					if(triggered & 0x4) gpio_set_gpio_pin(B02);
-					else gpio_clr_gpio_pin(B02);
-				}
-				if(w.tr_mute[3]) {
-					if(triggered & 0x8) gpio_set_gpio_pin(B03);
-					else gpio_clr_gpio_pin(B03);
-				}
-
-			}
-		}
-
-		monomeFrameDirty++;
-
-
 		// PARAM 0
 		if((rnd() % 255) < w.wp[pattern].cv_probs[0][pos] && w.cv_mute[0]) {
 			if(w.wp[pattern].cv_mode[0] == 0) {
@@ -430,6 +378,58 @@ void clock(u8 phase) {
 		spi_write(SPI,cv1>>4);
 		spi_write(SPI,cv1<<4);
 		spi_unselectChip(SPI,DAC_SPI);
+
+
+		// TRIGGER
+		triggered = 0;
+		if((rnd() % 255) < w.wp[pattern].step_probs[pos]) {
+			
+			if(w.wp[pattern].step_choice & 1<<pos) {
+				count = 0;
+				for(i1=0;i1<4;i1++)
+					if(w.wp[pattern].steps[pos] >> i1 & 1) {
+						found[count] = i1;
+						count++;
+					}
+
+				if(count == 0)
+					triggered = 0;
+				else if(count == 1)
+					triggered = 1<<found[0];
+				else
+					triggered = 1<<found[rnd()%count];
+			}	
+			else {
+				triggered = w.wp[pattern].steps[pos];
+			}
+			
+			if(w.wp[pattern].tr_mode == 0) {
+				if(triggered & 0x1 && w.tr_mute[0]) gpio_set_gpio_pin(B00);
+				if(triggered & 0x2 && w.tr_mute[1]) gpio_set_gpio_pin(B01);
+				if(triggered & 0x4 && w.tr_mute[2]) gpio_set_gpio_pin(B02);
+				if(triggered & 0x8 && w.tr_mute[3]) gpio_set_gpio_pin(B03);
+			} else {
+				if(w.tr_mute[0]) {
+					if(triggered & 0x1) gpio_set_gpio_pin(B00);
+					else gpio_clr_gpio_pin(B00);
+				}
+				if(w.tr_mute[1]) {
+					if(triggered & 0x2) gpio_set_gpio_pin(B01);
+					else gpio_clr_gpio_pin(B01);
+				}
+				if(w.tr_mute[2]) {
+					if(triggered & 0x4) gpio_set_gpio_pin(B02);
+					else gpio_clr_gpio_pin(B02);
+				}
+				if(w.tr_mute[3]) {
+					if(triggered & 0x8) gpio_set_gpio_pin(B03);
+					else gpio_clr_gpio_pin(B03);
+				}
+
+			}
+		}
+
+		monomeFrameDirty++;
 	}
 	else {
 		gpio_clr_gpio_pin(B10);
