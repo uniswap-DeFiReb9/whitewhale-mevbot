@@ -307,40 +307,40 @@ void clock(u8 phase) {
 			if(next_pos > LENGTH) next_pos -= LENGTH + 1;
 			cut_pos = 1;
 		}
-		else if(w.wp[pattern].step_mode == mPing) {     // PING, 12343212
-			if(pos == w.wp[pattern].loop_end && mPingFwd == w.wp[pattern].ping_dir) {
+        else if(w.wp[pattern].step_mode == mPing) {     // PING, 12343212
+            if(pos == w.wp[pattern].loop_end && mPingFwd == w.wp[pattern].ping_dir) {
                 w.wp[pattern].ping_dir = mPingRev;
                 next_pos += w.wp[pattern].ping_dir;
             }
-			else if(pos == w.wp[pattern].loop_start && mPingRev == w.wp[pattern].ping_dir) {
+            else if(pos == w.wp[pattern].loop_start && mPingRev == w.wp[pattern].ping_dir) {
                 w.wp[pattern].ping_dir = mPingFwd;
                 // set this here because this step changes the state needed to identify the switch
                 ping_pattern_jump = 1;
                 next_pos += w.wp[pattern].ping_dir;
             }
-			else if(pos >= LENGTH) next_pos = 0;
-			else next_pos += w.wp[pattern].ping_dir;
-			cut_pos = 0;
-		}
-		else if(w.wp[pattern].step_mode == mPingRep) {     // PINGREP, 1234432112
-			if(pos == w.wp[pattern].loop_end && mPingFwd == w.wp[pattern].ping_dir) {
+            else if(pos >= LENGTH) next_pos = 0;
+            else next_pos += w.wp[pattern].ping_dir;
+            cut_pos = 0;
+        }
+        else if(w.wp[pattern].step_mode == mPingRep) {     // PINGREP, 1234432112
+            if(pos == w.wp[pattern].loop_end && mPingFwd == w.wp[pattern].ping_dir) {
                 w.wp[pattern].ping_dir = mPingRev;
             }
-			else if(pos == w.wp[pattern].loop_end && mPingRev == w.wp[pattern].ping_dir) {
+            else if(pos == w.wp[pattern].loop_end && mPingRev == w.wp[pattern].ping_dir) {
                 next_pos += w.wp[pattern].ping_dir;
             }
-			else if(pos == w.wp[pattern].loop_start && mPingRev == w.wp[pattern].ping_dir) {
+            else if(pos == w.wp[pattern].loop_start && mPingRev == w.wp[pattern].ping_dir) {
                 w.wp[pattern].ping_dir = mPingFwd;
                 // set this here because this step changes the state needed to identify the switch
                 ping_pattern_jump = 1;
             }
-			else if(pos == w.wp[pattern].loop_start && mPingFwd == w.wp[pattern].ping_dir) {
+            else if(pos == w.wp[pattern].loop_start && mPingFwd == w.wp[pattern].ping_dir) {
                 next_pos += w.wp[pattern].ping_dir;
             }
-			else if(pos >= LENGTH) next_pos = 0;
-			else next_pos += w.wp[pattern].ping_dir;
-			cut_pos = 0;
-		}
+            else if(pos >= LENGTH) next_pos = 0;
+            else next_pos += w.wp[pattern].ping_dir;
+            cut_pos = 0;
+        }
 
 		// next pattern?
 		if(pos == w.wp[pattern].loop_end && w.wp[pattern].step_mode == mForward) {
@@ -859,49 +859,34 @@ static void handler_MonomeGridKey(s32 data) {
 					keyfirst_pos = x;
 				}
 				else if(key_alt == 1) {
-					if(x == LENGTH) {
-						w.wp[pattern].step_mode = mForward;
+                    if(x == 0) {
+                        if(pos == w.wp[pattern].loop_start)
+                            next_pos = w.wp[pattern].loop_end;
+                        else if(pos == 0)
+                            next_pos = LENGTH;
+                        else next_pos--;
+                        cut_pos = 1;
+                        monomeFrameDirty++;
                     }
-					else if(x == LENGTH-1) {
-						w.wp[pattern].step_mode = mReverse;
+                    // FIXME
+                    else if(x == 1) {
+                        if(pos == w.wp[pattern].loop_end) next_pos = w.wp[pattern].loop_start;
+                        else if(pos == LENGTH) next_pos = 0;
+                        else next_pos++;
+                        cut_pos = 1;
+                        monomeFrameDirty++;
                     }
-					else if(x == LENGTH-2) {
-						w.wp[pattern].step_mode = mDrunk;
+                    else if(x == 2 ) {
+                        next_pos = (rnd() % (w.wp[pattern].loop_len + 1)) + w.wp[pattern].loop_start;
+                        cut_pos = 1;
+                        monomeFrameDirty++;					
                     }
-					else if(x == LENGTH-3) {
-						w.wp[pattern].step_mode = mRandom;
+                    else { // Step modes, mPingRep not available on 8x8 grid
+                        if (LENGTH-x > 2) {
+                            w.wp[pattern].step_mode = LENGTH-x;
+                            w.wp[pattern].ping_dir = mPingFwd;
+                        }
                     }
-					else if(x == LENGTH-4) {
-						w.wp[pattern].step_mode = mPing;
-                        w.wp[pattern].ping_dir = mPingFwd;
-                    }
-					else if(x == LENGTH-5) {
-						w.wp[pattern].step_mode = mPingRep;
-                        w.wp[pattern].ping_dir = mPingFwd;
-                    }
-					// FIXME
-					else if(x == 0) {
-						if(pos == w.wp[pattern].loop_start)
-							next_pos = w.wp[pattern].loop_end;
-						else if(pos == 0)
-							next_pos = LENGTH;
-						else next_pos--;
-						cut_pos = 1;
-						monomeFrameDirty++;
-					}
-					// FIXME
-					else if(x == 1) {
-						if(pos == w.wp[pattern].loop_end) next_pos = w.wp[pattern].loop_start;
-						else if(pos == LENGTH) next_pos = 0;
-						else next_pos++;
-						cut_pos = 1;
-						monomeFrameDirty++;
-					}
-					else if(x == 2 ) {
-						next_pos = (rnd() % (w.wp[pattern].loop_len + 1)) + w.wp[pattern].loop_start;
-						cut_pos = 1;
-						monomeFrameDirty++;					
-					}
 				}
 			}
 			else if(keycount_pos == 2 && z) {
