@@ -74,7 +74,7 @@ typedef enum {
 } edit_modes;
 
 typedef enum {
-	mForward, mReverse, mDrunk, mRandom, mPing, mPingRep
+	mForward=0, mReverse, mDrunk, mRandom, mPing, mPingRep
 } step_modes;
 
 typedef enum {
@@ -882,7 +882,7 @@ static void handler_MonomeGridKey(s32 data) {
                         monomeFrameDirty++;					
                     }
                     else { // Step modes, mPingRep not available on 8x8 grid
-                        if (LENGTH-x > 2) {
+                        if (LENGTH-x < mPingRep) {
                             w.wp[pattern].step_mode = LENGTH-x;
                             w.wp[pattern].ping_dir = mPingFwd;
                         }
