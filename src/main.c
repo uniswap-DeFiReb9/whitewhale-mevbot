@@ -859,7 +859,13 @@ static void handler_MonomeGridKey(s32 data) {
 					keyfirst_pos = x;
 				}
 				else if(key_alt == 1) {
-                    if(x == 0) {
+                    if ((LENGTH > 8  && (LENGTH - x) <= mPingRep) || ((LENGTH - x) <= mPing)) {
+                        // Step modes, mPingRep not available on 8x8 grid
+                        w.wp[pattern].step_mode = LENGTH-x;
+                        w.wp[pattern].ping_dir = mPingFwd;
+                    }
+                    // FIXME
+                    else if(x == 0) {
                         if(pos == w.wp[pattern].loop_start)
                             next_pos = w.wp[pattern].loop_end;
                         else if(pos == 0)
@@ -880,12 +886,6 @@ static void handler_MonomeGridKey(s32 data) {
                         next_pos = (rnd() % (w.wp[pattern].loop_len + 1)) + w.wp[pattern].loop_start;
                         cut_pos = 1;
                         monomeFrameDirty++;					
-                    }
-                    else { // Step modes, mPingRep not available on 8x8 grid
-                        if (LENGTH-x < mPingRep) {
-                            w.wp[pattern].step_mode = LENGTH-x;
-                            w.wp[pattern].ping_dir = mPingFwd;
-                        }
                     }
 				}
 			}
@@ -1867,7 +1867,7 @@ static void ww_process_ii(uint8_t *data, uint8_t l) {
  			monomeFrameDirty++;
  			break;
  		case WW_PMODE:
-	 		if(d<0 || d>3)
+	 		if(d<mForward || d>mPingRep)
 				break;
  			w.wp[pattern].step_mode = d;
  			break;
