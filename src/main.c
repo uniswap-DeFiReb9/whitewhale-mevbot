@@ -342,6 +342,11 @@ void clock(u8 phase) {
             cut_pos = 0;
         }
 
+        // guard against -ve next_pos from skip back
+        if (next_pos < 0) {
+            next_pos = 0;
+        }
+
 		// next pattern?
 		if(pos == w.wp[pattern].loop_end && w.wp[pattern].step_mode == mForward) {
 			if(edit_mode == mSeries) 
