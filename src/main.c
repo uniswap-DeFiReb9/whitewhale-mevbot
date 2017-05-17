@@ -376,6 +376,67 @@ void clock(u8 phase) {
 			series_step++;
 
 
+		// PARAM 0
+		if((rnd() % 255) < w.wp[pattern].cv_probs[0][pos] && w.cv_mute[0]) {
+			if(w.wp[pattern].cv_mode[0] == 0) {
+				cv0 = w.wp[pattern].cv_curves[0][pos];
+			}
+			else {
+				count = 0;
+				for(i1=0;i1<16;i1++)
+					if(w.wp[pattern].cv_steps[0][pos] & (1<<i1)) {
+						found[count] = i1;
+						count++;
+					}
+				if(count == 1) 
+					cv_chosen[0] = found[0];
+				else
+					cv_chosen[0] = found[rnd() % count];
+				cv0 = w.wp[pattern].cv_values[cv_chosen[0]];			
+			}
+		}
+
+		// PARAM 1
+		if((rnd() % 255) < w.wp[pattern].cv_probs[1][pos] && w.cv_mute[1]) {
+			if(w.wp[pattern].cv_mode[1] == 0) {
+				cv1 = w.wp[pattern].cv_curves[1][pos];
+			}
+			else {
+				count = 0;
+				for(i1=0;i1<16;i1++)
+					if(w.wp[pattern].cv_steps[1][pos] & (1<<i1)) {
+						found[count] = i1;
+						count++;
+					}
+				if(count == 1) 
+					cv_chosen[1] = found[0];
+				else
+					cv_chosen[1] = found[rnd() % count];
+
+				cv1 = w.wp[pattern].cv_values[cv_chosen[1]];			
+			}
+		}
+
+
+		// write to DAC
+		spi_selectChip(DAC_SPI,DAC_SPI_NPCS);
+		// spi_write(SPI,0x39);	// update both
+		spi_write(DAC_SPI,0x31);	// update A
+		// spi_write(SPI,0x38);	// update B
+		// spi_write(SPI,pos*15);	// send position
+ 		// spi_write(SPI,0);
+
+ 		spi_write(DAC_SPI,cv0>>4);
+ 		spi_write(DAC_SPI,cv0<<4);
+		spi_unselectChip(DAC_SPI,DAC_SPI_NPCS);
+
+		spi_selectChip(DAC_SPI,DAC_SPI_NPCS);
+		spi_write(DAC_SPI,0x38);	// update B
+		spi_write(DAC_SPI,cv1>>4);
+		spi_write(DAC_SPI,cv1<<4);
+		spi_unselectChip(SPI,DAC_SPI_NPCS);
+
+
 		// TRIGGER
 		triggered = 0;
 		if((rnd() % 255) < w.wp[pattern].step_probs[pos]) {
@@ -427,65 +488,6 @@ void clock(u8 phase) {
 
 		monomeFrameDirty++;
 
-
-		// PARAM 0
-		if((rnd() % 255) < w.wp[pattern].cv_probs[0][pos] && w.cv_mute[0]) {
-			if(w.wp[pattern].cv_mode[0] == 0) {
-				cv0 = w.wp[pattern].cv_curves[0][pos];
-			}
-			else {
-				count = 0;
-				for(i1=0;i1<16;i1++)
-					if(w.wp[pattern].cv_steps[0][pos] & (1<<i1)) {
-						found[count] = i1;
-						count++;
-					}
-				if(count == 1) 
-					cv_chosen[0] = found[0];
-				else
-					cv_chosen[0] = found[rnd() % count];
-				cv0 = w.wp[pattern].cv_values[cv_chosen[0]];			
-			}
-		}
-
-		// PARAM 1
-		if((rnd() % 255) < w.wp[pattern].cv_probs[1][pos] && w.cv_mute[1]) {
-			if(w.wp[pattern].cv_mode[1] == 0) {
-				cv1 = w.wp[pattern].cv_curves[1][pos];
-			}
-			else {
-				count = 0;
-				for(i1=0;i1<16;i1++)
-					if(w.wp[pattern].cv_steps[1][pos] & (1<<i1)) {
-						found[count] = i1;
-						count++;
-					}
-				if(count == 1) 
-					cv_chosen[1] = found[0];
-				else
-					cv_chosen[1] = found[rnd() % count];
-
-				cv1 = w.wp[pattern].cv_values[cv_chosen[1]];			
-			}
-		}
-
-
-		// write to DAC
-    spi_selectChip(DAC_SPI,DAC_SPI_NPCS);
-		 // spi_write(SPI,0x39);	// update both
-    spi_write(DAC_SPI,0x31);	// update A
-		// spi_write(SPI,0x38);	// update B
-		// spi_write(SPI,pos*15);	// send position
- 		// spi_write(SPI,0);
-    spi_write(DAC_SPI,cv0>>4);
-    spi_write(DAC_SPI,cv0<<4);
-    spi_unselectChip(DAC_SPI,DAC_SPI_NPCS);
-
-    spi_selectChip(DAC_SPI,DAC_SPI_NPCS);
-    spi_write(DAC_SPI,0x38);	// update B
-    spi_write(DAC_SPI,cv1>>4);
-    spi_write(DAC_SPI,cv1<<4);
-    spi_unselectChip(SPI,DAC_SPI_NPCS);
 	}
 	else {
 		gpio_clr_gpio_pin(B10);
