@@ -68,6 +68,7 @@ CSRCS = \
        ../libavr32/src/i2c.c     \
        ../libavr32/src/init_trilogy.c \
        ../libavr32/src/init_common.c \
+       ../libavr32/src/interrupts.c \
        ../libavr32/src/monome.c \
        ../libavr32/src/timers.c \
        ../libavr32/src/usb.c \
@@ -78,6 +79,7 @@ CSRCS = \
        ../libavr32/src/usb/hid/uhi_hid.c \
        ../libavr32/src/usb/midi/uhi_midi.c \
        ../libavr32/src/usb/midi/midi.c \
+       ../libavr32/src/usb/msc/msc.c \
        avr32/drivers/adc/adc.c                            \
        avr32/drivers/flashc/flashc.c                      \
        avr32/drivers/gpio/gpio.c                          \
@@ -101,7 +103,7 @@ CSRCS = \
 ASSRCS = \
        avr32/utils/startup/trampoline_uc3.S               \
        avr32/drivers/intc/exception.S                     \
-              
+
 
 # List of include paths.
 INC_PATH = \
@@ -111,6 +113,7 @@ INC_PATH = \
        ../src/usb/ftdi \
        ../src/usb/hid \
        ../src/usb/midi \
+       ../src/usb/msc \
        ../conf      \
        ../conf/trilogy \
        avr32/boards                                       \
