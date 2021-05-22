@@ -2050,7 +2050,7 @@ int main(void)
 	init_usb_host();
 	init_monome();
 
-	init_i2c_slave(0x10);
+	init_i2c_follower(0x10);
 
 
 	print_dbg("\r\n\n// white whale //////////////////////////////// ");
