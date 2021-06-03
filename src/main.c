@@ -28,6 +28,7 @@
 #include "timers.h"
 #include "adc.h"
 #include "util.h"
+#include "cdc.h"
 #include "ftdi.h"
 
 // this
@@ -550,7 +551,7 @@ static void adcTimer_callback(void* o) {
 static void monome_poll_timer_callback(void* obj) {
   // asynchronous, non-blocking read
   // UHC callback spawns appropriate events
-	ftdi_read();
+	serial_read();
 }
 
 // monome refresh callback
@@ -586,6 +587,10 @@ static void handler_FtdiDisconnect(s32 data) {
 	timers_unset_monome();
 	// event_t e = { .type = kEventMonomeDisconnect };
 	// event_post(&e);
+}
+
+static void handler_SerialConnect(s32 data) {
+  monome_setup_mext();
 }
 
 static void handler_MonomeConnect(s32 data) {
@@ -1943,6 +1948,8 @@ static inline void assign_main_event_handlers(void) {
 	app_event_handlers[ kEventMonomePoll ]	= &handler_MonomePoll ;
 	app_event_handlers[ kEventMonomeRefresh ]	= &handler_MonomeRefresh ;
 	app_event_handlers[ kEventMonomeGridKey ]	= &handler_MonomeGridKey ;
+  app_event_handlers[ kEventSerialConnect ]	= &handler_SerialConnect ;
+	app_event_handlers[ kEventSerialDisconnect ]	= &handler_FtdiDisconnect ;
 }
 
 // app event loop
